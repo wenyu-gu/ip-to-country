@@ -1,15 +1,15 @@
-import IpVendorIpInfo from "../vendors/ipVendorIpInfo";
 import config from "../config/config";
 import NodeCache from "node-cache";
 import IpVendor from "../vendors/ipVendor";
+import IpVendorFactory from "../factories/ipVendorFactory";
 
 class IpService {
   private cache: NodeCache;
-  private ipVendor: IpVendor;
+  private ipVendors: IpVendor[];
 
   constructor() {
     this.cache = new NodeCache({ stdTTL: config.cacheTTL });
-    this.ipVendor = new IpVendorIpInfo(config.vendors.ipinfo);
+    this.ipVendors = IpVendorFactory.createAllIpVendors();
   }
 
   async getCountryByIp(ip: string): Promise<string> {
@@ -18,13 +18,23 @@ class IpService {
       return this.cache.get(ip)!;
     }
 
-    const country = this.ipVendor.getCountry(ip);
-    this.ipVendor.decrementRateLimit();
-    console.log(
-      `Remaining requests for ${this.ipVendor.name}: ${this.ipVendor.remainingRequests}`
-    );
-    this.cache.set(ip, country);
-    return country;
+    for (let ipVendor of this.ipVendors) {
+      if (ipVendor.remainingRequests > 0) {
+        try {
+          const country = await ipVendor.getCountry(ip);
+          this.cache.set(ip, country);
+          ipVendor.decrementRateLimit();
+          console.log(
+            `Remaining requests for ${ipVendor.name}: ${ipVendor.remainingRequests}`
+          );
+          return country;
+        } catch (error: any) {
+          console.error(`Error with vendor ${ipVendor.name}:`, error.message);
+        }
+      }
+    }
+
+    throw new Error("Rate limit exceeded for all vendors.");
   }
 }
 
