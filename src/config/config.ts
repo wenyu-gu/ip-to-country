@@ -8,13 +8,13 @@ export default {
       name: "ip-stack",
       url: "http://api.ipstack.com/",
       apiKey: process.env.IPSTACK_API_KEY,
-      rateLimit: 2, // per hour
+      rateLimit: 1, // per hour
     },
     ipinfo: {
       name: "ip-info",
       url: "https://ipinfo.io/",
       apiKey: process.env.IPINFO_API_KEY,
-      rateLimit: 1, // per hour
+      rateLimit: 5, // per hour
     },
   },
   vendorList: [
