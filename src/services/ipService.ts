@@ -1,6 +1,15 @@
+import IpVendorIpInfo from "../vendors/ipVendorIpInfo";
+import config from "../config/config";
+
 class IpService {
   async getCountryByIp(ip: string): Promise<string> {
-    return "working!" + ip;
+    const ipVendor = new IpVendorIpInfo(config.vendors.ipinfo);
+    const country = ipVendor.getCountry(ip);
+    ipVendor.decrementRateLimit();
+    console.log(
+      `Remaining requests for ${ipVendor.name}: ${ipVendor.remainingRequests}`
+    );
+    return country;
   }
 }
 
