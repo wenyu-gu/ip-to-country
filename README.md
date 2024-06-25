@@ -37,7 +37,15 @@ IPINFO_API_KEY=your_ipinfo_api_key
 PORT=1234
 ```
 
-6. Spin up the server on local
+6. (Optional)If you want to modify the rate limit for each vendor to make rate limit run out faster, you can go `src/config/configs.ts` and modify the following line in the vendor of your choice:
+
+```
+rateLimit: 1, // per hour
+```
+
+Please note the vendors used in this app have limited amount of free request per month.
+
+7. Spin up the server on local
 
 ```bash
 npm run dev
