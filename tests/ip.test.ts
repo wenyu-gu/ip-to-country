@@ -15,6 +15,12 @@ describe("GET /api/country/:ip", () => {
     expect(response.body.error).toBe("IP address is missing.");
   });
 
+  it("should return 400 for an invalid IP address format", async () => {
+    const response = await request(app).get("/api/country/this-is-not-an-ip");
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("Invalid IP address format.");
+  });
+
   it("should return country name for a valid IP address", async () => {
     (IpService.prototype.getCountryByIp as jest.Mock).mockResolvedValue(
       "United States"

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import IpService from "../services/ipService";
+import validator from "validator";
 
 class IpController {
   private ipService: IpService;
@@ -12,7 +13,12 @@ class IpController {
     const { ip } = req.params;
 
     if (!ip) {
-      res.status(400).json({ error: "Invalid IP address." });
+      res.status(400).json({ error: "IP address is missing." });
+      return;
+    }
+
+    if (!validator.isIP(ip)) {
+      res.status(400).json({ error: "Invalid IP address format." });
       return;
     }
 
